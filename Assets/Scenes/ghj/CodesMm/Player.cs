@@ -1,31 +1,54 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerRigidbodyMovement : MonoBehaviour
+public class Player : MonoBehaviour
 {
+    [Header("Movement")]
     public float moveSpeed = 6f;
+    public float airSpeedMult = 0.4f;
     public float groundDrag = 5f;
-    public float airControlMultiplier = 0.4f;
+
+    [Header("Gravity")]
+    public Vector3 gDirection = Vector3.down;
+    public float gStrength = 20f;
+    public float gRotateSpeed = 6f;
+    public KeyCode gravityKeybind = KeyCode.G;
+
+    [Header("Ground Check")]
+    public float playerHeight = 2f;
+    public LayerMask groundMask;
 
     private Rigidbody rb;
     private float horizontal;
     private float vertical;
-    private bool isGrounded;
+    private bool gControl = false;
+    private bool isGrounded = false;
 
-    public float playerHeight = 2f;
-    public LayerMask groundMask;
+    private float gravityChangeCooldown = 1f;
+    private float gravityChangeTimer = 0f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
         rb.freezeRotation = true;
     }
-
     void Update()
     {
-        // Get input (do NOT move Rigidbody here)
         horizontal = Input.GetAxisRaw("Horizontal");
         vertical = Input.GetAxisRaw("Vertical");
+
+        if (Input.GetKeyDown(gravityKeybind))
+            gControl = !gControl;
+
+        if (gControl)
+        {
+            HandleGravityCardinalInput();
+            gravityChangeTimer = gravityChangeCooldown;
+        }
+
+        if (gravityChangeTimer > 0f)
+            gravityChangeTimer -= Time.deltaTime;
 
         GroundCheck();
         ControlDrag();
@@ -33,31 +56,89 @@ public class PlayerRigidbodyMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        ApplyGravity();
         MovePlayer();
+        RotatePlayerToGravity();
+        LimitSpeed();
     }
 
+    
     void MovePlayer()
     {
-        Vector3 moveDirection = transform.forward * vertical + transform.right * horizontal;
+        Vector3 moveDir = transform.forward * vertical + transform.right * horizontal;
+        Vector3 projectedMove = Vector3.ProjectOnPlane(moveDir, gDirection).normalized;
 
-        if (isGrounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-        else
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airControlMultiplier, ForceMode.Force);
+        float multiplier = isGrounded ? 1f : airSpeedMult;
+        rb.AddForce(projectedMove * moveSpeed * 10f * multiplier, ForceMode.Force);
+    }
+
+    void LimitSpeed()
+    {
+        Vector3 surfaceVel = Vector3.ProjectOnPlane(rb.linearVelocity, gDirection);
+
+        if (surfaceVel.magnitude > moveSpeed)
+        {
+            Vector3 limitedVel = surfaceVel.normalized * moveSpeed;
+            rb.linearVelocity = limitedVel + Vector3.Project(rb.linearVelocity, gDirection);
+        }
     }
 
     void ControlDrag()
     {
-        rb.linearDamping = isGrounded ? groundDrag : 0f;
+        Vector3 surfaceVel = Vector3.ProjectOnPlane(rb.linearVelocity, gDirection);
+
+        if (isGrounded)
+            rb.linearVelocity -= surfaceVel * (groundDrag * Time.deltaTime);
     }
 
+    
+    void ApplyGravity()
+    {
+        rb.AddForce(gDirection * gStrength, ForceMode.Acceleration);
+    }
+
+    void RotatePlayerToGravity()
+    {
+        Quaternion targetRotation = Quaternion.FromToRotation(transform.up, -gDirection) * transform.rotation;
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, gRotateSpeed * Time.fixedDeltaTime);
+    }
+
+   
     void GroundCheck()
     {
-        isGrounded = Physics.Raycast(
-            transform.position,
-            Vector3.down,
-            playerHeight * 0.5f + 0.3f,
-            groundMask
-        );
+        if (gravityChangeTimer > 0f)
+        {
+            isGrounded = false;
+            return;
+        }
+
+        float checkDist = playerHeight * 0.5f + 0.3f;
+        RaycastHit hit;
+
+        isGrounded = Physics.Raycast(transform.position, -gDirection, out hit, checkDist, groundMask);
+    }
+    void HandleGravityCardinalInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SetGravityCardinal("down");
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SetGravityCardinal("up");
+        if (Input.GetKeyDown(KeyCode.Alpha3)) SetGravityCardinal("forward");
+        if (Input.GetKeyDown(KeyCode.Alpha4)) SetGravityCardinal("back");
+        if (Input.GetKeyDown(KeyCode.Alpha5)) SetGravityCardinal("right");
+        if (Input.GetKeyDown(KeyCode.Alpha6)) SetGravityCardinal("left");
+    }
+
+    public void SetGravityCardinal(string direction)
+    {
+        switch (direction.ToLower())
+        {
+            case "down": gDirection = Vector3.down; break;
+            case "up": gDirection = Vector3.up; break;
+            case "forward": gDirection = Vector3.forward; break;
+            case "back": gDirection = Vector3.back; break;
+            case "right": gDirection = Vector3.right; break;
+            case "left": gDirection = Vector3.left; break;
+            default:
+                break;
+        }
     }
 }
