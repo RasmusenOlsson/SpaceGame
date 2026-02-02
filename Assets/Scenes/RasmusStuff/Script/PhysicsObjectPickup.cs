@@ -8,8 +8,8 @@ public class PhysicsObjectPickup : MonoBehaviour
     private Rigidbody heldObjRB;
 
     [Header("Physics Parameter")]
-    [SerializeField] private float pickupRange = 5f;
-    [SerializeField] private float pickupForce = 150f;
+    [SerializeField] private float pickupRange = 5.0f;
+    [SerializeField] private float pickupForce = 150.0f;
 
     private void Update()
     {
@@ -21,7 +21,7 @@ public class PhysicsObjectPickup : MonoBehaviour
                 RaycastHit hit;
                 if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, pickupRange))
                 {
-                    PickUpObject((hit).transform.gameObject);
+                    PickUpObject(hit.transform.gameObject);
                 }
             }
             else
@@ -31,7 +31,7 @@ public class PhysicsObjectPickup : MonoBehaviour
         }
         if(heldObj != null)
         {
-            //Move objects.
+            MoveObject();
         }
     }
 
@@ -61,10 +61,10 @@ public class PhysicsObjectPickup : MonoBehaviour
     {
         //Move object when picked up
         heldObjRB.useGravity = true;
-        heldObjRB.linearDamping = 1f;
+        heldObjRB.linearDamping = 1;
         heldObjRB.constraints = RigidbodyConstraints.None;
 
-        heldObjRB.transform.parent = null;
+        heldObj.transform.parent = null;
         heldObj = null;
     }
 }
