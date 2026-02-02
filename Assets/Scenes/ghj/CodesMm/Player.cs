@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class FPSGravityPlayer : MonoBehaviour
+public class GravityPlayer : MonoBehaviour
 {
     [Header("View Reference")]
     public Transform viewTransform;
