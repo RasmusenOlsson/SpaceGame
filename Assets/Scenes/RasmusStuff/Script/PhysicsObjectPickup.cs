@@ -8,8 +8,8 @@ public class PhysicsObjectPickup : MonoBehaviour
     private Rigidbody heldObjRB;
 
     [Header("Physics Parameter")]
-    [SerializeField] private float pickupRange = 5.0f;
-    [SerializeField] private float pickupForce = 150.0f;
+    [SerializeField] private float pickupRange;
+    [SerializeField] private float pickupForce;
 
     private void Update()
     {
