@@ -1,18 +1,33 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Player : MonoBehaviour
+public class FPSGravityPlayer : MonoBehaviour
 {
+    [Header("View Reference")]
+    public Transform viewTransform;
+
     [Header("Movement")]
     public float moveSpeed = 6f;
     public float airSpeedMult = 0.4f;
     public float groundDrag = 5f;
+    public float jumpForce = 6f;
 
     [Header("Gravity")]
     public Vector3 gDirection = Vector3.down;
     public float gStrength = 20f;
     public float gRotateSpeed = 6f;
     public KeyCode gravityKeybind = KeyCode.G;
+
+    [Header("Allowed Gravity Directions")]
+    public bool enableDown = true;
+    public bool enableUp = true;
+    public bool enableForward = true;
+    public bool enableBack = true;
+    public bool enableRight = true;
+    public bool enableLeft = true;
+
+    [Header("Gravity Cooldown")]
+    public float gravityCooldown = 0.75f;
 
     [Header("Ground Check")]
     public float playerHeight = 2f;
@@ -21,11 +36,11 @@ public class Player : MonoBehaviour
     private Rigidbody rb;
     private float horizontal;
     private float vertical;
-    private bool gControl = false;
-    private bool isGrounded = false;
+    private bool isGrounded;
 
-    private float gravityChangeCooldown = 1f;
-    private float gravityChangeTimer = 0f;
+    private bool gravityControlActive = false;
+    private bool gravityReady = true;
+    private float gravityCooldownTimer = 0f;
 
     void Start()
     {
@@ -33,43 +48,54 @@ public class Player : MonoBehaviour
         rb.useGravity = false;
         rb.freezeRotation = true;
     }
+
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
         vertical = Input.GetAxisRaw("Vertical");
 
-        if (Input.GetKeyDown(gravityKeybind))
-            gControl = !gControl;
+        if (gravityCooldownTimer > 0f)
+            gravityCooldownTimer -= Time.deltaTime;
 
-        if (gControl)
+        if (Input.GetKeyDown(gravityKeybind) && gravityCooldownTimer <= 0f)
         {
-            HandleGravityCardinalInput();
-            gravityChangeTimer = gravityChangeCooldown;
+            gravityControlActive = !gravityControlActive;
+            gravityReady = gravityControlActive;
         }
 
-        if (gravityChangeTimer > 0f)
-            gravityChangeTimer -= Time.deltaTime;
+        if (gravityControlActive && gravityReady && gravityCooldownTimer <= 0f)
+            HandleGravityInput();
 
-        GroundCheck();
-        ControlDrag();
+        isGrounded = GroundCheck();
+
+        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+            Jump();
     }
 
     void FixedUpdate()
     {
         ApplyGravity();
         MovePlayer();
-        RotatePlayerToGravity();
+        RotateToGravity();
         LimitSpeed();
+        ControlDrag();
     }
 
-    
     void MovePlayer()
     {
-        Vector3 moveDir = transform.forward * vertical + transform.right * horizontal;
-        Vector3 projectedMove = Vector3.ProjectOnPlane(moveDir, gDirection).normalized;
+        Vector3 gDir = gDirection;
+        Vector3 viewForward = Vector3.ProjectOnPlane(viewTransform.forward, gDir).normalized;
+        Vector3 viewRight = Vector3.Cross(-gDir, viewForward).normalized;
+
+        Vector3 moveDir = viewForward * vertical + viewRight * horizontal;
 
         float multiplier = isGrounded ? 1f : airSpeedMult;
-        rb.AddForce(projectedMove * moveSpeed * 10f * multiplier, ForceMode.Force);
+        rb.AddForce(moveDir * moveSpeed * 10f * multiplier, ForceMode.Force);
+    }
+
+    void Jump()
+    {
+        rb.AddForce(-gDirection * jumpForce, ForceMode.Impulse);
     }
 
     void LimitSpeed()
@@ -85,60 +111,49 @@ public class Player : MonoBehaviour
 
     void ControlDrag()
     {
-        Vector3 surfaceVel = Vector3.ProjectOnPlane(rb.linearVelocity, gDirection);
+        if (!isGrounded) return;
 
-        if (isGrounded)
-            rb.linearVelocity -= surfaceVel * (groundDrag * Time.deltaTime);
+        Vector3 surfaceVel = Vector3.ProjectOnPlane(rb.linearVelocity, gDirection);
+        rb.linearVelocity -= surfaceVel * (groundDrag * Time.fixedDeltaTime);
     }
 
-    
     void ApplyGravity()
     {
         rb.AddForce(gDirection * gStrength, ForceMode.Acceleration);
     }
 
-    void RotatePlayerToGravity()
+    void RotateToGravity()
     {
-        Quaternion targetRotation = Quaternion.FromToRotation(transform.up, -gDirection) * transform.rotation;
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, gRotateSpeed * Time.fixedDeltaTime);
+        Quaternion targetRotation =
+            Quaternion.FromToRotation(transform.up, -gDirection) * transform.rotation;
+
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            gRotateSpeed * Time.fixedDeltaTime
+        );
     }
 
-   
-    void GroundCheck()
+    void HandleGravityInput()
     {
-        if (gravityChangeTimer > 0f)
-        {
-            isGrounded = false;
-            return;
-        }
+        if (Input.GetKeyDown(KeyCode.Alpha1) && enableDown) SetGravity(Vector3.down);
+        if (Input.GetKeyDown(KeyCode.Alpha2) && enableUp) SetGravity(Vector3.up);
+        if (Input.GetKeyDown(KeyCode.Alpha3) && enableForward) SetGravity(Vector3.forward);
+        if (Input.GetKeyDown(KeyCode.Alpha4) && enableBack) SetGravity(Vector3.back);
+        if (Input.GetKeyDown(KeyCode.Alpha5) && enableRight) SetGravity(Vector3.right);
+        if (Input.GetKeyDown(KeyCode.Alpha6) && enableLeft) SetGravity(Vector3.left);
+    }
 
+    void SetGravity(Vector3 dir)
+    {
+        gDirection = dir;
+        gravityReady = false;
+        gravityControlActive = false;
+        gravityCooldownTimer = gravityCooldown;
+    }
+    bool GroundCheck()
+    {
         float checkDist = playerHeight * 0.5f + 0.3f;
-        RaycastHit hit;
-
-        isGrounded = Physics.Raycast(transform.position, -gDirection, out hit, checkDist, groundMask);
-    }
-    void HandleGravityCardinalInput()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SetGravityCardinal("down");
-        if (Input.GetKeyDown(KeyCode.Alpha2)) SetGravityCardinal("up");
-        if (Input.GetKeyDown(KeyCode.Alpha3)) SetGravityCardinal("forward");
-        if (Input.GetKeyDown(KeyCode.Alpha4)) SetGravityCardinal("back");
-        if (Input.GetKeyDown(KeyCode.Alpha5)) SetGravityCardinal("right");
-        if (Input.GetKeyDown(KeyCode.Alpha6)) SetGravityCardinal("left");
-    }
-
-    public void SetGravityCardinal(string direction)
-    {
-        switch (direction.ToLower())
-        {
-            case "down": gDirection = Vector3.down; break;
-            case "up": gDirection = Vector3.up; break;
-            case "forward": gDirection = Vector3.forward; break;
-            case "back": gDirection = Vector3.back; break;
-            case "right": gDirection = Vector3.right; break;
-            case "left": gDirection = Vector3.left; break;
-            default:
-                break;
-        }
+        return Physics.Raycast(transform.position, -gDirection, checkDist, groundMask);
     }
 }
