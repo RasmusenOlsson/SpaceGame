@@ -7,63 +7,54 @@ public class GeneralButton : MonoBehaviour
     public float buttonMoveDistance = 0.2f; // Hur långt knappen åker ner
     public float buttonSpeed = 5f;          // Hur snabbt knappen rör sig
 
-    private Vector3 buttonStartPos;
-    private Vector3 buttonDownPos;
-    private bool isPressed = false;
+    public bool IsPressed { get; private set; } // Universellt state
 
-    // Event: Används för att trigga andra scripts
-    public delegate void ButtonAction();
-    public event ButtonAction OnButtonPressed;
-    public event ButtonAction OnButtonReleased;
+    private Vector3 startPos;
+    private Vector3 downPos;
+
+    private Coroutine moveRoutine;
 
     void Start()
     {
-        buttonStartPos = transform.position;
-        buttonDownPos = buttonStartPos - new Vector3(0, buttonMoveDistance, 0);
+        startPos = transform.localPosition; // Lokala positionen
+        downPos = startPos - new Vector3(0, buttonMoveDistance, 0);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!isPressed)
-        {
-            isPressed = true;
+        if (IsPressed) return;
 
-            // Flytta knappen ner
-            StartCoroutine(MoveButton(buttonDownPos));
+        IsPressed = true;
 
-            // Skriv ut i konsolen
-            Debug.Log("Knapp tryckt!");
-
-            // Trigga event
-            if (OnButtonPressed != null)
-                OnButtonPressed.Invoke();
-        }
+        // Stoppa eventuell pågående rörelse innan ny startar
+        if (moveRoutine != null) StopCoroutine(moveRoutine);
+        moveRoutine = StartCoroutine(MoveButton(downPos));
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (isPressed)
-        {
-            isPressed = false;
+        if (!IsPressed) return;
 
-            // Flytta knappen upp
-            StartCoroutine(MoveButton(buttonStartPos));
+        IsPressed = false;
 
-            // Skriv ut i konsolen
-            Debug.Log("Knapp släppt!");
-
-            // Trigga event
-            if (OnButtonReleased != null)
-                OnButtonReleased.Invoke();
-        }
+        // Stoppa eventuell pågående rörelse innan ny startar
+        if (moveRoutine != null) StopCoroutine(moveRoutine);
+        moveRoutine = StartCoroutine(MoveButton(startPos));
     }
 
-    IEnumerator MoveButton(Vector3 targetPos)
+    IEnumerator MoveButton(Vector3 target)
     {
-        while (Vector3.Distance(transform.position, targetPos) > 0.01f)
+        while (Vector3.Distance(transform.localPosition, target) > 0.001f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, buttonSpeed * Time.deltaTime);
+            transform.localPosition = Vector3.MoveTowards(
+                transform.localPosition,
+                target,
+                buttonSpeed * Time.deltaTime
+            );
             yield return null;
         }
+
+        // När rörelsen är klar, rensa referensen
+        moveRoutine = null;
     }
 }

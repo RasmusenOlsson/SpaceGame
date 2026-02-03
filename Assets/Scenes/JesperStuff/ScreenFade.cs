@@ -5,79 +5,64 @@ using System.Collections;
 
 public class ScreenFade : MonoBehaviour
 {
-    public Image fadeImage;              // UI Image som täcker hela skärmen
-    public float fadeOutDuration = 1f;
-    public float fadeInDuration = 1f;
-    public Transform cameraToRotate;
-    public float rotationAmount = 45f;
-    public bool rotateDuringFade = true;
+    public Image fadeImage;
 
-    private Quaternion initialRotation;
+    [Header("Fade durations (sekunder)")]
+    public float fadeInDuration = 0.5f;   // Fade in när scenen startar
+    public float fadeOutDuration = 2f;    // Fade ut när spelaren dör
 
-    void Awake()
+    private void Awake()
     {
-        // Se till att scenen börjar svart
-        if (fadeImage != null)
-            fadeImage.color = new Color(0, 0, 0, 1);
+        // Se till att tiden är normal
+        Time.timeScale = 1f;
 
-        if (cameraToRotate != null)
-            initialRotation = cameraToRotate.localRotation;
+        if (fadeImage != null)
+        {
+            fadeImage.gameObject.SetActive(true);
+            fadeImage.color = Color.black;
+            StartCoroutine(FadeFromBlack());
+        }
     }
 
-    void Start()
+    IEnumerator FadeFromBlack()
     {
-        // Fade in automatiskt varje gång scenen laddas
-        StartCoroutine(FadeIn());
+        float t = 0f;
+        Color startColor = fadeImage.color;
+        Color targetColor = new Color(0, 0, 0, 0);
+
+        while (t < fadeInDuration)
+        {
+            t += Time.unscaledDeltaTime;
+            fadeImage.color = Color.Lerp(startColor, targetColor, t / fadeInDuration);
+            yield return null;
+        }
+
+        fadeImage.color = targetColor;
+        fadeImage.gameObject.SetActive(false);
     }
 
     public void FadeOutAndRestart()
     {
-        StartCoroutine(FadeOutCoroutine());
+        StartCoroutine(FadeOutAndReloadCoroutine());
     }
 
-    IEnumerator FadeOutCoroutine()
+    IEnumerator FadeOutAndReloadCoroutine()
     {
+        fadeImage.gameObject.SetActive(true);
         float t = 0f;
-        Quaternion startRot = cameraToRotate != null ? cameraToRotate.localRotation : Quaternion.identity;
-        Quaternion endRot = startRot * Quaternion.Euler(-rotationAmount, 0, 0);
+        Color startColor = fadeImage.color;
+        Color targetColor = Color.black;
 
         while (t < fadeOutDuration)
         {
             t += Time.unscaledDeltaTime;
-            float alpha = t / fadeOutDuration;
-            if (fadeImage != null)
-                fadeImage.color = new Color(0, 0, 0, alpha);
-
-            if (rotateDuringFade && cameraToRotate != null)
-                cameraToRotate.localRotation = Quaternion.Slerp(startRot, endRot, alpha);
-
+            fadeImage.color = Color.Lerp(startColor, targetColor, t / fadeOutDuration);
             yield return null;
         }
+
+        fadeImage.color = targetColor;
 
         // Ladda om scenen
-        Time.timeScale = 1f; // återställ tid innan reload
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
-    IEnumerator FadeIn()
-    {
-        float t = fadeInDuration;
-
-        while (t > 0f)
-        {
-            t -= Time.unscaledDeltaTime;
-            float alpha = t / fadeInDuration;
-            if (fadeImage != null)
-                fadeImage.color = new Color(0, 0, 0, alpha);
-
-            yield return null;
-        }
-
-        // Återställ kameran
-        if (cameraToRotate != null)
-            cameraToRotate.localRotation = initialRotation;
-
-        // Säkerställ att tiden är normal
-        Time.timeScale = 1f;
     }
 }
