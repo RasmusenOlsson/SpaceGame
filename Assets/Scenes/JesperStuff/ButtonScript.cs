@@ -4,40 +4,50 @@ using System.Collections;
 public class GeneralButton : MonoBehaviour
 {
     [Header("Button settings")]
-    public float buttonMoveDistance = 0.2f; // Hur långt knappen åker ner
-    public float buttonSpeed = 5f;          // Hur snabbt knappen rör sig
+    public float buttonMoveDistance = 0.2f;
+    public float buttonSpeed = 5f;
 
-    public bool IsPressed { get; private set; } // Universellt state
+    [Header("Weight settings")]
+    public float requiredMass = 5f; // Objektets minsta massa som kan trycka ner knappen
+
+    public bool IsPressed { get; private set; }
 
     private Vector3 startPos;
     private Vector3 downPos;
-
     private Coroutine moveRoutine;
 
     void Start()
     {
-        startPos = transform.localPosition; // Lokala positionen
+        startPos = transform.localPosition;
         downPos = startPos - new Vector3(0, buttonMoveDistance, 0);
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        Rigidbody rb = other.attachedRigidbody;
+
+        // Om det inte finns Rigidbody eller massan är för liten, ignorera
+        if (rb == null || rb.mass < requiredMass) return;
+
         if (IsPressed) return;
 
         IsPressed = true;
 
-        // Stoppa eventuell pågående rörelse innan ny startar
         if (moveRoutine != null) StopCoroutine(moveRoutine);
         moveRoutine = StartCoroutine(MoveButton(downPos));
     }
 
     private void OnTriggerExit(Collider other)
     {
+        Rigidbody rb = other.attachedRigidbody;
+
+        // Endast lyfta knappen om samma masskrav gäller
+        if (rb == null || rb.mass < requiredMass) return;
+
         if (!IsPressed) return;
 
         IsPressed = false;
 
-        // Stoppa eventuell pågående rörelse innan ny startar
         if (moveRoutine != null) StopCoroutine(moveRoutine);
         moveRoutine = StartCoroutine(MoveButton(startPos));
     }
@@ -54,7 +64,6 @@ public class GeneralButton : MonoBehaviour
             yield return null;
         }
 
-        // När rörelsen är klar, rensa referensen
         moveRoutine = null;
     }
 }
