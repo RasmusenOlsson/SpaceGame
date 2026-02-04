@@ -6,11 +6,6 @@ public class GravityPlayer : MonoBehaviour
     [Header("View Reference")]
     public Transform viewTransform;
 
-    [Header("SoundEffects")]
-    [SerializeField] private AudioClip footStepSound;
-    [SerializeField] private AudioClip landSound;
-
-
     [Header("Movement")]
     public float moveSpeed = 6f;
     public float airSpeedMult = 0.4f;
@@ -101,7 +96,6 @@ public class GravityPlayer : MonoBehaviour
 
     void MovePlayer()
     {
-        SoundManager.instance.PlaySoundFXclip(footStepSound, transform, 1f);
         Vector3 gDir = gDirection;
         Vector3 viewForward = Vector3.ProjectOnPlane(viewTransform.forward, gDir).normalized;
         Vector3 viewRight = Vector3.Cross(-gDir, viewForward).normalized;
