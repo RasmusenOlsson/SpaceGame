@@ -6,9 +6,6 @@ public class GravityPlayer : MonoBehaviour
     [Header("View Reference")]
     public Transform viewTransform;
 
-    [Header("Sounds")]
-    [SerializeField] private AudioClip landSoundEffect;
-
     [Header("Movement")]
     public float moveSpeed = 6f;
     public float airSpeedMult = 0.4f;
@@ -65,7 +62,6 @@ public class GravityPlayer : MonoBehaviour
 
         if (Input.GetKeyDown(gravityKeybind) && gravityCooldownTimer <= 0f)
         {
-            SoundManager.instance.PlaySoundFXclip(landSoundEffect, transform, 1f);
             gravityControlActive = !gravityControlActive;
             gravityReady = gravityControlActive;
         }
