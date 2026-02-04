@@ -4,8 +4,9 @@ using UnityEngine.EventSystems;
 public class UIWireDebug : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     [Header("Inställningar")]
-    public string targetName = "RedEnd"; 
-    public Canvas parentCanvas;          
+    public string targetName = "RedEnd";
+    public Canvas parentCanvas;
+    public WireTask wireTask;
 
     private LineRenderer line;
     private RectTransform canvasRect;
@@ -24,14 +25,14 @@ public class UIWireDebug : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
     {
         startPos = transform.position;
         line.positionCount = 2;
-        line.useWorldSpace = true; // VIKTIGT: Linjen ritas i världskoordinater
+        line.useWorldSpace = true;
         ResetLine();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (isConnected) return;
-        Debug.Log("Börjar dra sladden..."); // Ser du detta i konsolen?
+        Debug.Log("Börjar dra sladden...");
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -39,22 +40,18 @@ public class UIWireDebug : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
         if (isConnected) return;
 
         Vector3 worldPoint;
-        
-        // Här omvandlar vi musens position till 3D-position på Canvasen
+
         bool hitCanvas = RectTransformUtility.ScreenPointToWorldPointInRectangle(
-            canvasRect, 
-            eventData.position, 
-            eventData.pressEventCamera, // Viktigt för World Space canvas
+            canvasRect,
+            eventData.position,
+            eventData.pressEventCamera,
             out worldPoint
         );
 
         if (hitCanvas)
         {
-            // Sätt Z lite närmare kameran så linjen syns framför plattan
-            // OBS: Om din canvas är vriden kan detta behöva justeras.
-            // Enklast är att använda samma Z som canvasen men minus litegrann.
             Vector3 finalPos = worldPoint;
-            finalPos.z = transform.position.z - 0.05f; 
+            finalPos.z = transform.position.z - 0.05f;
 
             line.SetPosition(1, finalPos);
         }
@@ -70,11 +67,11 @@ public class UIWireDebug : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
         if (hitObject != null)
         {
             Debug.Log("Träffade objekt: " + hitObject.name);
-            
-            // Vi kollar om namnet stämmer (eller om föräldern har namnet)
+
             if (hitObject.name == targetName)
             {
                 Connect(hitObject.transform.position);
+                wireTask.RegisterSuccess();
             }
             else
             {
@@ -88,7 +85,6 @@ public class UIWireDebug : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
             ResetLine();
         }
     }
-
     void Connect(Vector3 targetPos)
     {
         isConnected = true;
@@ -101,5 +97,7 @@ public class UIWireDebug : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
         line.SetPosition(0, startPos);
         line.SetPosition(1, startPos);
     }
+    
+
 }
 
