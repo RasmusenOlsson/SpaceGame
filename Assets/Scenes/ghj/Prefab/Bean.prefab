@@ -140,9 +140,9 @@ GameObject:
   - component: {fileID: 2886037313908969693}
   - component: {fileID: 2654794104457797017}
   - component: {fileID: 6832072609864552744}
-  - component: {fileID: 2819483206200524449}
   - component: {fileID: 8530319981811444070}
   - component: {fileID: 5854827949345951104}
+  - component: {fileID: 112559882680895461}
   m_Layer: 0
   m_Name: Bean
   m_TagString: Untagged
@@ -242,20 +242,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2819483206200524449
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7158539990510306019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e78a6669e10fb3e4a8dab2db45f6a598, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraTransform: {fileID: 9045939942606853903}
-  mouseSensitivity: 2.5
 --- !u!114 &8530319981811444070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315,3 +301,17 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &112559882680895461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7158539990510306019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e78a6669e10fb3e4a8dab2db45f6a598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraTransform: {fileID: 9045939942606853903}
+  mouseSensitivity: 2.5
