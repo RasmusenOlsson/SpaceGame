@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class GravityPlayer : MonoBehaviour
@@ -36,12 +36,15 @@ public class GravityPlayer : MonoBehaviour
     private Rigidbody rb;
     private float horizontal;
     private float vertical;
-    private bool isGrounded;
-
+    public bool Grounded;
+    public float GroundedCheckDistance;
+    private float bufferCheckDistance = 0.1f;
+    
     private bool gravityControlActive = false;
     private bool gravityReady = true;
     private float gravityCooldownTimer = 0f;
-
+    RaycastHit hit;
+    public Vector3 ratcast = Vector3.down;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -66,10 +69,17 @@ public class GravityPlayer : MonoBehaviour
         if (gravityControlActive && gravityReady && gravityCooldownTimer <= 0f)
             HandleGravityInput();
 
-        isGrounded = GroundCheck();
+        GroundedCheckDistance = (GetComponent<CapsuleCollider>().height / 2) + bufferCheckDistance;
 
-        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
-            Jump();
+        if (Physics.Raycast(transform.position, ratcast, out hit, GroundedCheckDistance))
+        {
+            Grounded = true;
+        }
+        else
+        {
+            Grounded = false;
+        }
+
     }
 
     void FixedUpdate()
@@ -89,13 +99,8 @@ public class GravityPlayer : MonoBehaviour
 
         Vector3 moveDir = viewForward * vertical + viewRight * horizontal;
 
-        float multiplier = isGrounded ? 1f : airSpeedMult;
+        float multiplier = Grounded ? 1f : airSpeedMult;
         rb.AddForce(moveDir * moveSpeed * 10f * multiplier, ForceMode.Force);
-    }
-
-    void Jump()
-    {
-        rb.AddForce(-gDirection * jumpForce, ForceMode.Impulse);
     }
 
     void LimitSpeed()
@@ -111,7 +116,7 @@ public class GravityPlayer : MonoBehaviour
 
     void ControlDrag()
     {
-        if (!isGrounded) return;
+        if (!Grounded) return;
 
         Vector3 surfaceVel = Vector3.ProjectOnPlane(rb.linearVelocity, gDirection);
         rb.linearVelocity -= surfaceVel * (groundDrag * Time.fixedDeltaTime);
@@ -150,10 +155,7 @@ public class GravityPlayer : MonoBehaviour
         gravityReady = false;
         gravityControlActive = false;
         gravityCooldownTimer = gravityCooldown;
+        ratcast = dir;
     }
-    bool GroundCheck()
-    {
-        float checkDist = playerHeight * 0.5f + 0.3f;
-        return Physics.Raycast(transform.position, -gDirection, checkDist, groundMask);
-    }
+
 }
