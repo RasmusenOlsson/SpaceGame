@@ -4,66 +4,66 @@ using System.Collections;
 public class GeneralButton : MonoBehaviour
 {
     [Header("Button settings")]
-    public float buttonMoveDistance = 0.2f; // Hur långt knappen åker ner
-    public float buttonSpeed = 5f;          // Hur snabbt knappen rör sig
+    public float buttonMoveDistance = 0.2f;
+    public float buttonSpeed = 5f;
 
-    private Vector3 buttonStartPos;
-    private Vector3 buttonDownPos;
-    private bool isPressed = false;
+    [Header("Weight settings")]
+    public float requiredMass = 5f; // Objektets minsta massa som kan trycka ner knappen
 
-    // Event: Används för att trigga andra scripts
-    public delegate void ButtonAction();
-    public event ButtonAction OnButtonPressed;
-    public event ButtonAction OnButtonReleased;
+    public bool IsPressed { get; private set; }
+
+    private Vector3 startPos;
+    private Vector3 downPos;
+    private Coroutine moveRoutine;
 
     void Start()
     {
-        buttonStartPos = transform.position;
-        buttonDownPos = buttonStartPos - new Vector3(0, buttonMoveDistance, 0);
+        startPos = transform.localPosition;
+        downPos = startPos - new Vector3(0, buttonMoveDistance, 0);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!isPressed)
-        {
-            isPressed = true;
+        Rigidbody rb = other.attachedRigidbody;
 
-            // Flytta knappen ner
-            StartCoroutine(MoveButton(buttonDownPos));
+        // Om det inte finns Rigidbody eller massan är för liten, ignorera
+        if (rb == null || rb.mass < requiredMass) return;
 
-            // Skriv ut i konsolen
-            Debug.Log("Knapp tryckt!");
+        if (IsPressed) return;
 
-            // Trigga event
-            if (OnButtonPressed != null)
-                OnButtonPressed.Invoke();
-        }
+        IsPressed = true;
+
+        if (moveRoutine != null) StopCoroutine(moveRoutine);
+        moveRoutine = StartCoroutine(MoveButton(downPos));
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (isPressed)
-        {
-            isPressed = false;
+        Rigidbody rb = other.attachedRigidbody;
 
-            // Flytta knappen upp
-            StartCoroutine(MoveButton(buttonStartPos));
+        // Endast lyfta knappen om samma masskrav gäller
+        if (rb == null || rb.mass < requiredMass) return;
 
-            // Skriv ut i konsolen
-            Debug.Log("Knapp släppt!");
+        if (!IsPressed) return;
 
-            // Trigga event
-            if (OnButtonReleased != null)
-                OnButtonReleased.Invoke();
-        }
+        IsPressed = false;
+
+        if (moveRoutine != null) StopCoroutine(moveRoutine);
+        moveRoutine = StartCoroutine(MoveButton(startPos));
     }
 
-    IEnumerator MoveButton(Vector3 targetPos)
+    IEnumerator MoveButton(Vector3 target)
     {
-        while (Vector3.Distance(transform.position, targetPos) > 0.01f)
+        while (Vector3.Distance(transform.localPosition, target) > 0.001f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, buttonSpeed * Time.deltaTime);
+            transform.localPosition = Vector3.MoveTowards(
+                transform.localPosition,
+                target,
+                buttonSpeed * Time.deltaTime
+            );
             yield return null;
         }
+
+        moveRoutine = null;
     }
 }
