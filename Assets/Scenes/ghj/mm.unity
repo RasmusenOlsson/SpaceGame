@@ -241,6 +241,7 @@ GameObject:
   - component: {fileID: 286135500}
   - component: {fileID: 286135499}
   - component: {fileID: 286135504}
+  - component: {fileID: 286135505}
   - component: {fileID: 286135503}
   - component: {fileID: 286135498}
   m_Layer: 0
@@ -296,7 +297,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.45
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -383,7 +384,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewTransform: {fileID: 653991144}
   moveSpeed: 6
-  airSpeedMult: 0.4
+  airSpeedMult: 0.2
   groundDrag: 0.5
   jumpForce: 6
   gDirection: {x: 0, y: -1, z: 0}
@@ -401,6 +402,9 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  Grounded: 0
+  GroundedCheckDistance: 0
+  ratcast: {x: 0, y: -1, z: 0}
 --- !u!114 &286135504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,6 +419,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 653991144}
   mouseSensitivity: 2.5
+--- !u!136 &286135505
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286135497}
+  m_Material: {fileID: 13400000, guid: e28cc28a7f9848e448fff8c8ad7c6783, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1.9
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.1, z: 0}
 --- !u!1 &448704567
 GameObject:
   m_ObjectHideFlags: 0
