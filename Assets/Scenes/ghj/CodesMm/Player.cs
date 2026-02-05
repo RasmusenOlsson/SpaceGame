@@ -26,8 +26,9 @@ public class GravityPlayer : MonoBehaviour
     public bool enableRight = true;
     public bool enableLeft = true;
 
-    [Header("Gravity Cooldown")]
+    [Header("Cooldowns")]
     public float gravityCooldown = 0.75f;
+    public float FeetCooldown = 0.6f;
 
     [Header("Ground Check")]
     public float playerHeight = 2f;
@@ -37,14 +38,22 @@ public class GravityPlayer : MonoBehaviour
     private float horizontal;
     private float vertical;
     public bool Grounded;
+    public bool wasGrounded = true;
     public float GroundedCheckDistance;
     private float bufferCheckDistance = 0.1f;
-    
+
     private bool gravityControlActive = false;
     private bool gravityReady = true;
     private float gravityCooldownTimer = 0f;
+    private float FeetCD = 0f;
+
     RaycastHit hit;
     public Vector3 ratcast = Vector3.down;
+
+    [Header("Sound")]
+    [SerializeField] private AudioClip landingSoundEffect;
+    [SerializeField] private AudioClip[] footstepSoundEffect;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -59,6 +68,9 @@ public class GravityPlayer : MonoBehaviour
 
         if (gravityCooldownTimer > 0f)
             gravityCooldownTimer -= Time.deltaTime;
+
+        if (FeetCD > 0f)
+            FeetCD -= Time.deltaTime;
 
         if (Input.GetKeyDown(gravityKeybind) && gravityCooldownTimer <= 0f)
         {
@@ -78,10 +90,52 @@ public class GravityPlayer : MonoBehaviour
         else
         {
             Grounded = false;
+            wasGrounded = false;
         }
 
-    }
+        if (Grounded == true && wasGrounded == false)
+        {
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+          /*  SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f);
+            SoundManager.instance.PlaySoundFXclip(landingSoundEffect, transform, 1f); */
 
+            wasGrounded = true;
+        }
+    }
 
     void FixedUpdate()
     {
@@ -92,6 +146,20 @@ public class GravityPlayer : MonoBehaviour
         ControlDrag();
     }
 
+    void Feet()
+    {
+        if (!Grounded) return;
+
+        Vector3 surfaceVel = Vector3.ProjectOnPlane(rb.linearVelocity, gDirection);
+
+        if (surfaceVel.magnitude < 0.5f) return;
+
+        if (FeetCD > 0f) return;
+        
+        SoundManager.instance.PlayRandomSoundFXclip(footstepSoundEffect, transform, 1f);
+        FeetCD = FeetCooldown;
+    }
+
     void MovePlayer()
     {
         Vector3 gDir = gDirection;
@@ -99,6 +167,8 @@ public class GravityPlayer : MonoBehaviour
         Vector3 viewRight = Vector3.Cross(-gDir, viewForward).normalized;
 
         Vector3 moveDir = viewForward * vertical + viewRight * horizontal;
+
+        Feet();
 
         float multiplier = Grounded ? 1f : airSpeedMult;
         rb.AddForce(moveDir * moveSpeed * 10f * multiplier, ForceMode.Force);
@@ -158,5 +228,4 @@ public class GravityPlayer : MonoBehaviour
         gravityCooldownTimer = gravityCooldown;
         ratcast = dir;
     }
-
 }
