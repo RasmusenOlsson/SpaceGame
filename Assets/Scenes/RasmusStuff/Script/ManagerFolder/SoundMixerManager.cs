@@ -6,7 +6,7 @@ public class SoundMixerManager : MonoBehaviour
     [SerializeField] private AudioMixer audioMixer;
 
 
-    private void SetMasterVoluem(float level)
+    public void SetMasterVoluem(float level)
     {
         audioMixer.SetFloat("masterVolume", level);
     }
