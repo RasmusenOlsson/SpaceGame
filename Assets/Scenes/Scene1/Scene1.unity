@@ -9156,7 +9156,7 @@ MonoBehaviour:
   viewTransform: {fileID: 2023065118}
   moveSpeed: 6
   airSpeedMult: 0.4
-  groundDrag: 0.25
+  groundDrag: 5
   jumpForce: 6
   gDirection: {x: 0, y: -1, z: 0}
   gStrength: 10
