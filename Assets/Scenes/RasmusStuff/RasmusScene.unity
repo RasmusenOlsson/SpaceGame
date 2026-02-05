@@ -368,10 +368,21 @@ MonoBehaviour:
   enableRight: 1
   enableLeft: 1
   gravityCooldown: 0.75
+  FeetCooldown: 0.6
   playerHeight: 2
   groundMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
+  Grounded: 0
+  wasGrounded: 1
+  GroundedCheckDistance: 0
+  ratcast: {x: 0, y: -1, z: 0}
+  landingSoundEffect: {fileID: 8300000, guid: 828460f6c39afad49982211920974da1, type: 3}
+  footstepSoundEffect:
+  - {fileID: 8300000, guid: 88ac5fba0a2718946a836acb8d710f6d, type: 3}
+  - {fileID: 8300000, guid: 7d62097f5611fe841a943a3f55f51917, type: 3}
+  - {fileID: 8300000, guid: 9a9c6d2fcb329444babcaa43bcd74ca3, type: 3}
+  - {fileID: 8300000, guid: 462c8af3d5bfc5e44874e634da813f43, type: 3}
 --- !u!54 &245067285
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -612,6 +623,51 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!1 &348239355
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 348239357}
+  - component: {fileID: 348239356}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &348239356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348239355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f28dc00ac3f066c4dbf0df840e853a3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundObject: {fileID: 5437819177354689981, guid: cb98106db703c4d448b44d138a475bbc, type: 3}
+--- !u!4 &348239357
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348239355}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &846346247
 GameObject:
   m_ObjectHideFlags: 0
@@ -1111,7 +1167,7 @@ GameObject:
   - component: {fileID: 1927024456}
   - component: {fileID: 1927024455}
   - component: {fileID: 1927024454}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1276,3 +1332,4 @@ SceneRoots:
   - {fileID: 1726217661}
   - {fileID: 846346251}
   - {fileID: 245067289}
+  - {fileID: 348239357}
