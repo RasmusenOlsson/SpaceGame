@@ -22,6 +22,10 @@ public class DoubleDoor : MonoBehaviour
     public MoveAxis rightAxis = MoveAxis.X;
     public bool invertRight;
 
+    [Header("Sounds")]
+    [SerializeField] private AudioClip doorOpening;
+    [SerializeField] private AudioClip doorClosing;
+
     private Vector3 leftClosedPos;
     private Vector3 rightClosedPos;
     private Vector3 leftOpenPos;
@@ -77,6 +81,7 @@ public class DoubleDoor : MonoBehaviour
     void OpenDoor()
     {
         isOpen = true;
+        SoundManager.instance.PlaySoundFXclip(doorOpening, transform, 1f);
         StopAllCoroutines();
         StartCoroutine(MoveDoor(leftDoor, leftOpenPos));
         StartCoroutine(MoveDoor(rightDoor, rightOpenPos));
@@ -85,6 +90,7 @@ public class DoubleDoor : MonoBehaviour
     void CloseDoor()
     {
         isOpen = false;
+        SoundManager.instance.PlaySoundFXclip(doorClosing, transform, 1f);
         StopAllCoroutines();
         StartCoroutine(MoveDoor(leftDoor, leftClosedPos));
         StartCoroutine(MoveDoor(rightDoor, rightClosedPos));
