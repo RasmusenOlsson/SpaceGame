@@ -53,6 +53,7 @@ public class GravityPlayer : MonoBehaviour
     [Header("Sound")]
     [SerializeField] private AudioClip landingSoundEffect;
     [SerializeField] private AudioClip[] footstepSoundEffect;
+    [SerializeField] private AudioClip changeGravityEffect;
 
     void Start()
     {
@@ -223,6 +224,7 @@ public class GravityPlayer : MonoBehaviour
     void SetGravity(Vector3 dir)
     {
         gDirection = dir;
+        SoundManager.instance.PlaySoundFXclip(changeGravityEffect, transform, 1f);
         gravityReady = false;
         gravityControlActive = false;
         gravityCooldownTimer = gravityCooldown;
