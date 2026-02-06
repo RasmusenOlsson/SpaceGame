@@ -2903,6 +2903,8 @@ MonoBehaviour:
   endingScript: {fileID: 1986552706}
   triggerEndingA: 1
   kaboooommmmmmm: {fileID: 8300000, guid: 75a725119bb686243aea52e5b506f4fb, type: 3}
+  music1: {fileID: 8300000, guid: 1f819e47727695c4bb1885d0db9edb8b, type: 3}
+  music2: {fileID: 8300000, guid: 1f819e47727695c4bb1885d0db9edb8b, type: 3}
 --- !u!4 &590467089 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 43ef1754269e04d4695dcbcf5395b273, type: 3}
@@ -3646,6 +3648,8 @@ MonoBehaviour:
   endingScript: {fileID: 1986552706}
   triggerEndingA: 0
   kaboooommmmmmm: {fileID: 8300000, guid: 86530dca1c9417642b035ceb0783de0c, type: 3}
+  music1: {fileID: 0}
+  music2: {fileID: 0}
 --- !u!1 &793055601
 GameObject:
   m_ObjectHideFlags: 0
