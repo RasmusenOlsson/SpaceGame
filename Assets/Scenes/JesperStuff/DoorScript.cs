@@ -6,7 +6,7 @@ public class DoubleDoor : MonoBehaviour
     [Header("References")]
     public Transform leftDoor;
     public Transform rightDoor;
-    public WallButton button; // knappen som styr dörren
+    public GeneralButton button; // knappen som styr dörren
 
     [Header("Movement")]
     public float openDistance = 2f;
@@ -46,10 +46,10 @@ public class DoubleDoor : MonoBehaviour
     {
         if (button == null) return;
 
-        if (button.IsOn && !isOpen)
+        if (button.IsPressed && !isOpen)
             OpenDoor();
 
-        if (!button.IsOn && isOpen)
+        if (!button.IsPressed && isOpen)
             CloseDoor();
     }
 
