@@ -6276,13 +6276,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftDoor: {fileID: 252384860}
   rightDoor: {fileID: 1402453619}
-  button: {fileID: 897378585}
+  button: {fileID: 0}
   openDistance: 2
   openSpeed: 2
   leftAxis: 0
   invertLeft: 0
   rightAxis: 0
   invertRight: 0
+  doorOpening: {fileID: 8300000, guid: c7ff3ce3cbc1d8241a049ff67630e311, type: 3}
+  doorClosing: {fileID: 8300000, guid: f0d792db108e89944b51992ce12326b6, type: 3}
 --- !u!1001 &1729004107
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6455,59 +6457,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!1 &1737235413
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1737235414}
-  - component: {fileID: 1737235415}
-  m_Layer: 0
-  m_Name: Door
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1737235414
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1737235413}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1737235415
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1737235413}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 251ef32b25d865c4c823285f45596ad5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leftDoor: {fileID: 0}
-  rightDoor: {fileID: 0}
-  button: {fileID: 0}
-  openDistance: 2
-  openSpeed: 2
-  leftAxis: 0
-  invertLeft: 0
-  rightAxis: 0
-  invertRight: 0
 --- !u!1001 &1757493180
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8294,7 +8243,6 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1737235414}
   - {fileID: 1606451116}
   - {fileID: 2103504808}
   - {fileID: 1940322592}
