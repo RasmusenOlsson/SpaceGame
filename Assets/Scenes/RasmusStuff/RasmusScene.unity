@@ -778,6 +778,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 7d62097f5611fe841a943a3f55f51917, type: 3}
   - {fileID: 8300000, guid: 9a9c6d2fcb329444babcaa43bcd74ca3, type: 3}
   - {fileID: 8300000, guid: 462c8af3d5bfc5e44874e634da813f43, type: 3}
+  changeGravityEffect: {fileID: 8300000, guid: 310b178e0e550c54f8999bd280850831, type: 3}
 --- !u!54 &245067285
 Rigidbody:
   m_ObjectHideFlags: 0
