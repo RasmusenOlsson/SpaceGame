@@ -17,7 +17,7 @@ public class MainMenu : MonoBehaviour
 
     public void PlayGame()
     {
-        SceneManager.LoadScene("RasmusScene");
+        SceneManager.LoadScene("Scene1");
     }
 
     public void ExitGame()

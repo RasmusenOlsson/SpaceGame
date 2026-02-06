@@ -34,7 +34,7 @@ public class SceneSwitcher : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
 
         // Load the actual game scene
-        SceneManager.LoadScene("RasmusScene"); // Replace with your game's scene name
+        SceneManager.LoadScene("Scene1"); // Replace with your game's scene name
     }
 
     // Called when Exit button is pressed
