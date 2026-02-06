@@ -16,8 +16,6 @@ public class EndingButtonScript : MonoBehaviour
 
     [Header("Sounds")]
     [SerializeField] private AudioClip kaboooommmmmmm;
-    [SerializeField] private AudioClip endingAMusic;
-    [SerializeField] private AudioClip endingBMusic;
 
     public bool IsPressed { get; private set; }
 
@@ -48,13 +46,11 @@ public class EndingButtonScript : MonoBehaviour
         {
             if (triggerEndingA)
             {
-                SoundManager.instance.PlaySoundFXclip(endingAMusic, transform, 1f);
                 SoundManager.instance.PlaySoundFXclip(kaboooommmmmmm, transform, 1f);
                 endingScript.ShowEndingA();
             }
             else
             {
-                SoundManager.instance.PlaySoundFXclip(endingBMusic, transform, 1f);
                 endingScript.ShowEndingB();
             }
         }
